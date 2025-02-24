@@ -1,11 +1,25 @@
-
 import React, { useState } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
 import CategoryCard from "@/components/CategoryCard";
 import { motion } from "framer-motion";
 
-const SAMPLE_COUNTRIES = ["USA", "Canada", "UK", "Australia", "France", "Germany", "Japan", "Spain"];
+const COUNTRIES = [
+  "Anguilla", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
+  "Austria", "Bahamas", "Belize", "Bermuda", "Brazil", "Cambodia", "Canada", 
+  "Cayman Islands", "Chile", "Colombia", "Costa Rica", "Croatia", "Cyprus", 
+  "Czech Republic", "Denmark", "Dominica", "Dominican Republic", "Ecuador", 
+  "Egypt", "El Salvador", "Estonia", "Finland", "France", "Georgia", "Germany", 
+  "Ghana", "Gibraltar", "Greece", "Grenada", "Honduras", "Hong Kong", "Hungary", 
+  "Iceland", "India", "Indonesia", "Ireland", "Italy", "Japan", "Latvia", 
+  "Lithuania", "Luxembourg", "Malaysia", "Malta", "Mauritius", "Mexico", 
+  "Montenegro", "Netherlands", "New Zealand", "Norway", "Palau", "Panama", 
+  "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Romania", "San Marino", 
+  "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", 
+  "South Africa", "South Korea", "Spain", "St. Kitts & Nevis", "St. Lucia", 
+  "Sweden", "Switzerland", "Taiwan", "Thailand", "Turkey", "UAE", "UK", "Uruguay", 
+  "USA", "Vietnam"
+];
 
 const DEFAULT_CATEGORIES = {
   legalStatus: {
@@ -54,7 +68,6 @@ const Index = () => {
   const [country1, setCountry1] = useState("USA");
   const [country2, setCountry2] = useState("Canada");
 
-  // Simulated compatibility calculation
   const compatibility = {
     overallScore: 85,
     categories: {
@@ -80,14 +93,14 @@ const Index = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           <CountrySelector
-            countries={SAMPLE_COUNTRIES}
+            countries={COUNTRIES}
             value={country1}
             onChange={setCountry1}
             label="Primary Citizenship"
             otherCountry={country2}
           />
           <CountrySelector
-            countries={SAMPLE_COUNTRIES}
+            countries={COUNTRIES}
             value={country2}
             onChange={setCountry2}
             label="Secondary Citizenship"
@@ -95,7 +108,7 @@ const Index = () => {
           />
         </div>
 
-        <div className="max-w-md mx-auto">
+        <div className="max-w-2xl mx-auto">
           <CompatibilityScore
             score={compatibility.overallScore}
             country1={country1}
