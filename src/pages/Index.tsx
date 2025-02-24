@@ -74,23 +74,671 @@ interface CountryData {
 }
 
 const COUNTRY_DATA: Record<string, CountryData> = {
-  USA: {
-    countryId: "US",
-    dualCitizenship: "Yes",
-    residencyYears: 5,
-    militaryService: "De jure",
-    taxTreaty: "Several countries",
-    votingStatus: "Universal"
+  "Anguilla": {
+    "countryId": "AI",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
   },
-  Canada: {
-    countryId: "CA",
-    dualCitizenship: "Yes",
-    residencyYears: 3,
-    militaryService: "No",
-    taxTreaty: "Yes",
-    votingStatus: "Universal"
+  "Antigua and Barbuda": {
+    "countryId": "AG",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
   },
-};
+  "Argentina": {
+    "countryId": "AR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 2,
+    "militaryService": "De jure",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Armenia": {
+    "countryId": "AM",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Australia": {
+    "countryId": "AU",
+    "dualCitizenship": "Yes",
+    "residencyYears": 4,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Austria": {
+    "countryId": "AT",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Bahamas": {
+    "countryId": "BS",
+    "dualCitizenship": "No",
+    "residencyYears": 6,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Belize": {
+    "countryId": "BZ",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "De jure",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Bermuda": {
+    "countryId": "BM",
+    "dualCitizenship": "Yes",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Brazil": {
+    "countryId": "BR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 4,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Cambodia": {
+    "countryId": "KH",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Canada": {
+    "countryId": "CA",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Cayman Islands": {
+    "countryId": "KY",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Chile": {
+    "countryId": "CL",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Infrequent",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Colombia": {
+    "countryId": "CO",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Costa Rica": {
+    "countryId": "CR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Croatia": {
+    "countryId": "HR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 8,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Cyprus": {
+    "countryId": "CY",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Czech Republic": {
+    "countryId": "CZ",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Denmark": {
+    "countryId": "DK",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Dominica": {
+    "countryId": "DM",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Dominican Republic": {
+    "countryId": "DO",
+    "dualCitizenship": "Yes",
+    "residencyYears": 2,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Ecuador": {
+    "countryId": "EC",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Egypt": {
+    "countryId": "EG",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "El Salvador": {
+    "countryId": "SV",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Estonia": {
+    "countryId": "EE",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 8,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Finland": {
+    "countryId": "FI",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "France": {
+    "countryId": "FR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Georgia": {
+    "countryId": "GE",
+    "dualCitizenship": "No",
+    "residencyYears": 10,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Germany": {
+    "countryId": "DE",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 8,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Ghana": {
+    "countryId": "GH",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Gibraltar": {
+    "countryId": "GI",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Greece": {
+    "countryId": "GR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Grenada": {
+    "countryId": "GD",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Honduras": {
+    "countryId": "HN",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 3,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Hong Kong": {
+    "countryId": "HK",
+    "dualCitizenship": "No",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Hungary": {
+    "countryId": "HU",
+    "dualCitizenship": "Yes",
+    "residencyYears": 8,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Iceland": {
+    "countryId": "IS",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "India": {
+    "countryId": "IN",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Indonesia": {
+    "countryId": "ID",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Ireland": {
+    "countryId": "IE",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Italy": {
+    "countryId": "IT",
+    "dualCitizenship": "Yes",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Japan": {
+    "countryId": "JP",
+    "dualCitizenship": "No",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Latvia": {
+    "countryId": "LV",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Lithuania": {
+    "countryId": "LT",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Luxembourg": {
+    "countryId": "LU",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Malaysia": {
+    "countryId": "MY",
+    "dualCitizenship": "No",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Malta": {
+    "countryId": "MT",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Mauritius": {
+    "countryId": "MU",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Mexico": {
+    "countryId": "MX",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Montenegro": {
+    "countryId": "ME",
+    "dualCitizenship": "Yes",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Netherlands": {
+    "countryId": "NL",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "New Zealand": {
+    "countryId": "NZ",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Norway": {
+    "countryId": "NO",
+    "dualCitizenship": "Yes",
+    "residencyYears": 7,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Palau": {
+    "countryId": "PW",
+    "dualCitizenship": "No",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Panama": {
+    "countryId": "PA",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Paraguay": {
+    "countryId": "PY",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Peru": {
+    "countryId": "PE",
+    "dualCitizenship": "Yes",
+    "residencyYears": 2,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Philippines": {
+    "countryId": "PH",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Poland": {
+    "countryId": "PL",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Portugal": {
+    "countryId": "PT",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Romania": {
+    "countryId": "RO",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "San Marino": {
+    "countryId": "SM",
+    "dualCitizenship": "No",
+    "residencyYears": 30,
+    "militaryService": "De jure",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Seychelles": {
+    "countryId": "SC",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Sierra Leone": {
+    "countryId": "SL",
+    "dualCitizenship": "No",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Singapore": {
+    "countryId": "SG",
+    "dualCitizenship": "No",
+    "residencyYears": 2,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Slovakia": {
+    "countryId": "SK",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 8,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Slovenia": {
+    "countryId": "SI",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "South Africa": {
+    "countryId": "ZA",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "South Korea": {
+    "countryId": "KR",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Spain": {
+    "countryId": "ES",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 10,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "St. Kitts & Nevis": {
+    "countryId": "KN",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "St. Lucia": {
+    "countryId": "LC",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Sweden": {
+    "countryId": "SE",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Switzerland": {
+    "countryId": "CH",
+    "dualCitizenship": "Yes",
+    "residencyYears": 10,
+    "militaryService": "Choice",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Taiwan": {
+    "countryId": "TW",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Universal"
+  },
+  "Thailand": {
+    "countryId": "TH",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "Turkey": {
+    "countryId": "TR",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "UAE": {
+    "countryId": "AE",
+    "dualCitizenship": "Conditional",
+    "residencyYears": 30,
+    "militaryService": "Yes",
+    "taxTreaty": "No",
+    "votingStatus": "Selective"
+  },
+  "UK": {
+    "countryId": "GB",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  },
+  "Uruguay": {
+    "countryId": "UY",
+    "dualCitizenship": "Yes",
+    "residencyYears": 3,
+    "militaryService": "De jure",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal and Compulsory"
+  },
+  "USA": {
+    "countryId": "US",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "De jure",
+    "taxTreaty": "Several countries",
+    "votingStatus": "Universal"
+  },
+  "Vietnam": {
+    "countryId": "VN",
+    "dualCitizenship": "No",
+    "residencyYears": 5,
+    "militaryService": "Yes",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal"
+  }
+}
 
 interface Compatibility {
   overallScore: number;
