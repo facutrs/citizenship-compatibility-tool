@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
 import CategoryCard from "@/components/CategoryCard";
@@ -64,20 +65,86 @@ const DEFAULT_CATEGORIES = {
   },
 };
 
+// Add country data
+const COUNTRY_DATA: Record<string, {
+  dualCitizenship: string;
+  residencyYears: number;
+  militaryService: string;
+  taxTreaty: string;
+  votingStatus: string;
+}> = {
+  USA: {
+    dualCitizenship: "Yes",
+    residencyYears: 5,
+    militaryService: "De jure",
+    taxTreaty: "Yes",
+    votingStatus: "Universal"
+  },
+  Canada: {
+    dualCitizenship: "Yes",
+    residencyYears: 3,
+    militaryService: "No",
+    taxTreaty: "Yes",
+    votingStatus: "Universal"
+  },
+  // Add more countries as needed
+};
+
+const calculateCompatibility = (country1: string, country2: string) => {
+  const c1 = COUNTRY_DATA[country1];
+  const c2 = COUNTRY_DATA[country2];
+
+  if (!c1 || !c2) return null;
+
+  const scores = {
+    legalStatus: c1.dualCitizenship === "Yes" && c2.dualCitizenship === "Yes" ? 100 : 50,
+    residencyRequirements: Math.max(0, 100 - Math.abs(c1.residencyYears - c2.residencyYears) * 10),
+    militaryService: c1.militaryService === "No" && c2.militaryService === "No" ? 100 : 60,
+    taxObligations: c1.taxTreaty === "Yes" && c2.taxTreaty === "Yes" ? 100 : 70,
+    votingRights: c1.votingStatus === c2.votingStatus ? 100 : 75
+  };
+
+  const descriptions = {
+    legalStatus: scores.legalStatus === 100 ? "Both countries allow dual citizenship" : "Some restrictions on dual citizenship",
+    residencyRequirements: `Residency requirements differ by ${Math.abs(c1.residencyYears - c2.residencyYears)} years`,
+    militaryService: scores.militaryService === 100 ? "No mandatory military service" : "Military service obligations may apply",
+    taxObligations: scores.taxObligations === 100 ? "Tax treaty in place between countries" : "Limited tax agreements",
+    votingRights: scores.votingRights === 100 ? "Similar voting rights" : "Different voting regulations"
+  };
+
+  const overallScore = Math.round(
+    Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length
+  );
+
+  return { overallScore, scores, descriptions };
+};
+
 const Index = () => {
   const [country1, setCountry1] = useState("USA");
   const [country2, setCountry2] = useState("Canada");
+  const [compatibility, setCompatibility] = useState<{
+    overallScore: number;
+    scores: Record<string, number>;
+    descriptions: Record<string, string>;
+  } | null>(null);
 
-  const compatibility = {
-    overallScore: 85,
-    categories: {
-      legalStatus: { score: 90, description: "Both countries allow dual citizenship" },
-      residencyRequirements: { score: 80, description: "Compatible residency requirements" },
-      militaryService: { score: 70, description: "Some military service obligations may apply" },
-      taxObligations: { score: 85, description: "Tax treaty in place between countries" },
-      votingRights: { score: 75, description: "Similar voting rights with some restrictions" },
-    },
-  };
+  useEffect(() => {
+    const result = calculateCompatibility(country1, country2);
+    if (result) {
+      setCompatibility({
+        overallScore: result.overallScore,
+        categories: Object.keys(DEFAULT_CATEGORIES).reduce((acc, key) => ({
+          ...acc,
+          [key]: {
+            score: result.scores[key],
+            description: result.descriptions[key]
+          }
+        }), {})
+      });
+    }
+  }, [country1, country2]);
+
+  if (!compatibility) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sage-50 to-sage-100">
@@ -98,6 +165,7 @@ const Index = () => {
             onChange={setCountry1}
             label="Primary Citizenship"
             otherCountry={country2}
+            type="primary"
           />
           <CountrySelector
             countries={COUNTRIES}
@@ -105,6 +173,7 @@ const Index = () => {
             onChange={setCountry2}
             label="Secondary Citizenship"
             otherCountry={country1}
+            type="secondary"
           />
         </div>
 
@@ -116,8 +185,8 @@ const Index = () => {
           />
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Object.entries(DEFAULT_CATEGORIES).map(([key, category], index) => (
+        <div className="max-w-2xl mx-auto space-y-6">
+          {Object.entries(DEFAULT_CATEGORIES).map(([key, category]) => (
             <CategoryCard
               key={key}
               title={category.title}
