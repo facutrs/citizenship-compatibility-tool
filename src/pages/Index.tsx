@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
@@ -65,32 +64,45 @@ const DEFAULT_CATEGORIES = {
   },
 };
 
-// Add country data
-const COUNTRY_DATA: Record<string, {
-  dualCitizenship: string;
+interface CountryData {
+  countryId: string;
+  dualCitizenship: "Yes" | "No" | "Conditional";
   residencyYears: number;
-  militaryService: string;
-  taxTreaty: string;
+  militaryService: "Yes" | "No" | "De jure" | "Choice" | "Infrequent";
+  taxTreaty: "Yes" | "No" | "Several countries";
   votingStatus: string;
-}> = {
+}
+
+const COUNTRY_DATA: Record<string, CountryData> = {
   USA: {
+    countryId: "US",
     dualCitizenship: "Yes",
     residencyYears: 5,
     militaryService: "De jure",
-    taxTreaty: "Yes",
+    taxTreaty: "Several countries",
     votingStatus: "Universal"
   },
   Canada: {
+    countryId: "CA",
     dualCitizenship: "Yes",
     residencyYears: 3,
     militaryService: "No",
     taxTreaty: "Yes",
     votingStatus: "Universal"
   },
-  // Add more countries as needed
 };
 
-const calculateCompatibility = (country1: string, country2: string) => {
+interface Compatibility {
+  overallScore: number;
+  categories: {
+    [key: string]: {
+      score: number;
+      description: string;
+    };
+  };
+}
+
+const calculateCompatibility = (country1: string, country2: string): Compatibility | null => {
   const c1 = COUNTRY_DATA[country1];
   const c2 = COUNTRY_DATA[country2];
 
@@ -116,32 +128,26 @@ const calculateCompatibility = (country1: string, country2: string) => {
     Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length
   );
 
-  return { overallScore, scores, descriptions };
+  return {
+    overallScore,
+    categories: Object.keys(scores).reduce((acc, key) => ({
+      ...acc,
+      [key]: {
+        score: scores[key as keyof typeof scores],
+        description: descriptions[key as keyof typeof descriptions]
+      }
+    }), {})
+  };
 };
 
 const Index = () => {
   const [country1, setCountry1] = useState("USA");
   const [country2, setCountry2] = useState("Canada");
-  const [compatibility, setCompatibility] = useState<{
-    overallScore: number;
-    scores: Record<string, number>;
-    descriptions: Record<string, string>;
-  } | null>(null);
+  const [compatibility, setCompatibility] = useState<Compatibility | null>(null);
 
   useEffect(() => {
     const result = calculateCompatibility(country1, country2);
-    if (result) {
-      setCompatibility({
-        overallScore: result.overallScore,
-        categories: Object.keys(DEFAULT_CATEGORIES).reduce((acc, key) => ({
-          ...acc,
-          [key]: {
-            score: result.scores[key],
-            description: result.descriptions[key]
-          }
-        }), {})
-      });
-    }
+    setCompatibility(result);
   }, [country1, country2]);
 
   if (!compatibility) return null;
@@ -182,6 +188,8 @@ const Index = () => {
             score={compatibility.overallScore}
             country1={country1}
             country2={country2}
+            country1Id={COUNTRY_DATA[country1]?.countryId}
+            country2Id={COUNTRY_DATA[country2]?.countryId}
           />
         </div>
 
@@ -190,8 +198,8 @@ const Index = () => {
             <CategoryCard
               key={key}
               title={category.title}
-              score={compatibility.categories[key as keyof typeof compatibility.categories].score}
-              description={compatibility.categories[key as keyof typeof compatibility.categories].description}
+              score={compatibility.categories[key].score}
+              description={compatibility.categories[key].description}
               implications={category.implications}
             />
           ))}
