@@ -5,6 +5,27 @@
   text-align: center;
 }
 
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.country-flag {
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 3em;
+  line-height: 1;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
