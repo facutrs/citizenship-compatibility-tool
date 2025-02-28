@@ -1,5 +1,5 @@
 
-import React,{ useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 
