@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -60,4 +61,23 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Background styles */
+body {
+  background: linear-gradient(to bottom right, #f0f4f8, #d1e3f5);
+  min-height: 100vh;
+}
+
+/* Compatibility categories */
+.category-high {
+  color: #4ade80;
+}
+
+.category-medium {
+  color: #fbbf24;
+}
+
+.category-low {
+  color: #f87171;
 }

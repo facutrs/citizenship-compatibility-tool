@@ -30,8 +30,8 @@ const CompatibilityScore = ({ score, country1, country2, country1Id, country2Id 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-lg animate-fadeIn">
       <div className="flex items-center justify-between space-x-4">
-        <div className="flex items-center gap-4 flex-1">
-          <span className="text-6xl">{getFlag(country1Id)}</span>
+        <div className="flex items-center gap-2 flex-1">
+          <span className="text-7xl">{getFlag(country1Id)}</span>
           <span className="text-sage-600 font-semibold">{country1}</span>
         </div>
         <div className="flex-1">
@@ -57,9 +57,9 @@ const CompatibilityScore = ({ score, country1, country2, country1Id, country2Id 
           </Progress>
           <div className="text-sm text-gray-500 mt-2 text-center">Compatibility Score</div>
         </div>
-        <div className="flex items-center gap-4 flex-1 justify-end">
+        <div className="flex items-center gap-2 flex-1 justify-end">
           <span className="text-sage-600 font-semibold">{country2}</span>
-          <span className="text-6xl">{getFlag(country2Id)}</span>
+          <span className="text-7xl">{getFlag(country2Id)}</span>
         </div>
       </div>
     </div>

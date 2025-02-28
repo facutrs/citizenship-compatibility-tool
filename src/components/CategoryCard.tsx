@@ -14,9 +14,15 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getIcon = () => {
-    if (score >= 80) return <CheckCircle2 className="text-sage-500 h-6 w-6" />;
+    if (score >= 80) return <CheckCircle2 className="text-green-500 h-6 w-6" />;
     if (score >= 50) return <AlertTriangle className="text-amber-500 h-6 w-6" />;
     return <XCircle className="text-red-500 h-6 w-6" />;
+  };
+
+  const getScoreColor = () => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 50) return "text-amber-600";
+    return "text-red-600";
   };
 
   return (
@@ -34,11 +40,14 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
             {getIcon()}
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           </div>
-          {isExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-500" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-gray-500" />
-          )}
+          <div className="flex items-center gap-2">
+            <span className={`font-bold ${getScoreColor()}`}>{score}%</span>
+            {isExpanded ? (
+              <ChevronUp className="h-5 w-5 text-gray-500" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-500" />
+            )}
+          </div>
         </div>
       </button>
       
@@ -51,9 +60,9 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
           <p className="text-gray-600">{description}</p>
           <ul className="space-y-2">
             {implications.map((implication, index) => (
-              <li key={index} className="text-sm text-gray-500 flex items-center gap-2">
-                <div className="h-1 w-1 rounded-full bg-sage-400" />
-                {implication}
+              <li key={index} className="text-sm text-gray-500 flex items-start gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mt-1.5" />
+                <span>{implication}</span>
               </li>
             ))}
           </ul>
