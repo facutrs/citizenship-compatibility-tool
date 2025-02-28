@@ -3,6 +3,7 @@ import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
 import CategoryCard from "@/components/CategoryCard";
 import { motion } from "framer-motion";
+import { calculateCompatibility } from "@/utils/compatibilityCalculator";
 
 const COUNTRIES = [
   "Anguilla", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
@@ -24,43 +25,23 @@ const COUNTRIES = [
 const DEFAULT_CATEGORIES = {
   legalStatus: {
     title: "Legal Status",
-    implications: [
-      "Valid passport from both countries required",
-      "Must declare dual citizenship status",
-      "No restrictions on holding public office",
-    ],
+    implications: [],
   },
-  residencyRequirements: {
-    title: "Residency Requirements",
-    implications: [
-      "Minimum 183 days per year in primary country",
-      "Physical presence test applies for tax purposes",
-      "Must maintain valid address in both countries",
-    ],
+  residency: {
+    title: "Residency",
+    implications: [],
   },
   militaryService: {
     title: "Military Service",
-    implications: [
-      "Selective service registration required in US",
-      "May impact security clearance eligibility",
-      "Special permissions needed for military service",
-    ],
+    implications: [],
   },
   taxObligations: {
     title: "Tax Obligations",
-    implications: [
-      "Annual tax returns required in both countries",
-      "Foreign tax credits available",
-      "FBAR reporting requirements apply",
-    ],
+    implications: [],
   },
   votingRights: {
     title: "Voting Rights",
-    implications: [
-      "Cannot vote in certain local elections",
-      "Must declare primary voting jurisdiction",
-      "Special registration requirements apply",
-    ],
+    implications: [],
   },
 };
 
@@ -71,6 +52,8 @@ interface CountryData {
   militaryService: "Yes" | "No" | "De jure" | "Choice" | "Infrequent";
   taxTreaty: "Yes" | "No" | "Several countries";
   votingStatus: string;
+  citizenshipByDescent?: string;
+  citizenshipByMarriage?: string;
 }
 
 const COUNTRY_DATA: Record<string, CountryData> = {
@@ -80,7 +63,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 3 years"
   },
   "Antigua and Barbuda": {
     "countryId": "AG",
@@ -88,7 +73,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 3 years"
   },
   "Argentina": {
     "countryId": "AR",
@@ -96,7 +83,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 2,
     "militaryService": "De jure",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 2 years"
   },
   "Armenia": {
     "countryId": "AM",
@@ -104,7 +93,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 2 years"
   },
   "Australia": {
     "countryId": "AU",
@@ -112,7 +103,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 4,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 4 years"
   },
   "Austria": {
     "countryId": "AT",
@@ -120,7 +113,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 6 years"
   },
   "Bahamas": {
     "countryId": "BS",
@@ -128,7 +123,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 6,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Belize": {
     "countryId": "BZ",
@@ -136,7 +133,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "De jure",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 1 year"
   },
   "Bermuda": {
     "countryId": "BM",
@@ -144,7 +143,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 10 years"
   },
   "Brazil": {
     "countryId": "BR",
@@ -152,7 +153,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 4,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 1 year"
   },
   "Cambodia": {
     "countryId": "KH",
@@ -160,7 +163,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 3 years"
   },
   "Canada": {
     "countryId": "CA",
@@ -168,7 +173,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 3 years"
   },
   "Cayman Islands": {
     "countryId": "KY",
@@ -176,7 +183,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Chile": {
     "countryId": "CL",
@@ -184,7 +193,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Infrequent",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Colombia": {
     "countryId": "CO",
@@ -192,7 +203,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Costa Rica": {
     "countryId": "CR",
@@ -200,7 +213,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Croatia": {
     "countryId": "HR",
@@ -208,7 +223,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 8,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Cyprus": {
     "countryId": "CY",
@@ -216,7 +233,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Czech Republic": {
     "countryId": "CZ",
@@ -224,7 +243,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Denmark": {
     "countryId": "DK",
@@ -232,7 +253,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Dominica": {
     "countryId": "DM",
@@ -240,7 +263,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Dominican Republic": {
     "countryId": "DO",
@@ -248,7 +273,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 2,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Ecuador": {
     "countryId": "EC",
@@ -256,7 +283,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Egypt": {
     "countryId": "EG",
@@ -264,7 +293,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "El Salvador": {
     "countryId": "SV",
@@ -272,7 +303,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Estonia": {
     "countryId": "EE",
@@ -280,7 +313,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 8,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Finland": {
     "countryId": "FI",
@@ -288,7 +323,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "France": {
     "countryId": "FR",
@@ -296,7 +333,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Georgia": {
     "countryId": "GE",
@@ -304,7 +343,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Germany": {
     "countryId": "DE",
@@ -312,7 +353,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 8,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Ghana": {
     "countryId": "GH",
@@ -320,7 +363,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Gibraltar": {
     "countryId": "GI",
@@ -328,7 +373,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Greece": {
     "countryId": "GR",
@@ -336,7 +383,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Grenada": {
     "countryId": "GD",
@@ -344,7 +393,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Honduras": {
     "countryId": "HN",
@@ -352,7 +403,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Hong Kong": {
     "countryId": "HK",
@@ -360,7 +413,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Hungary": {
     "countryId": "HU",
@@ -368,7 +423,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 8,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Iceland": {
     "countryId": "IS",
@@ -376,7 +433,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "India": {
     "countryId": "IN",
@@ -384,7 +443,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Indonesia": {
     "countryId": "ID",
@@ -392,7 +453,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Ireland": {
     "countryId": "IE",
@@ -400,7 +463,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Italy": {
     "countryId": "IT",
@@ -408,7 +473,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Japan": {
     "countryId": "JP",
@@ -416,7 +483,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Latvia": {
     "countryId": "LV",
@@ -424,7 +493,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Lithuania": {
     "countryId": "LT",
@@ -432,7 +503,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Luxembourg": {
     "countryId": "LU",
@@ -440,7 +513,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Malaysia": {
     "countryId": "MY",
@@ -448,7 +523,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Malta": {
     "countryId": "MT",
@@ -456,7 +533,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Mauritius": {
     "countryId": "MU",
@@ -464,7 +543,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Mexico": {
     "countryId": "MX",
@@ -472,7 +553,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Montenegro": {
     "countryId": "ME",
@@ -480,7 +563,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Netherlands": {
     "countryId": "NL",
@@ -488,7 +573,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "New Zealand": {
     "countryId": "NZ",
@@ -496,7 +583,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Norway": {
     "countryId": "NO",
@@ -504,7 +593,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 7,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Palau": {
     "countryId": "PW",
@@ -512,7 +603,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Panama": {
     "countryId": "PA",
@@ -520,7 +613,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Paraguay": {
     "countryId": "PY",
@@ -528,7 +623,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Peru": {
     "countryId": "PE",
@@ -536,7 +633,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 2,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Philippines": {
     "countryId": "PH",
@@ -544,7 +643,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Poland": {
     "countryId": "PL",
@@ -552,7 +653,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Portugal": {
     "countryId": "PT",
@@ -560,7 +663,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Romania": {
     "countryId": "RO",
@@ -568,7 +673,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "San Marino": {
     "countryId": "SM",
@@ -576,7 +683,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 30,
     "militaryService": "De jure",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Seychelles": {
     "countryId": "SC",
@@ -584,7 +693,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Sierra Leone": {
     "countryId": "SL",
@@ -592,7 +703,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Singapore": {
     "countryId": "SG",
@@ -600,7 +713,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 2,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Slovakia": {
     "countryId": "SK",
@@ -608,7 +723,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 8,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Slovenia": {
     "countryId": "SI",
@@ -616,7 +733,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "South Africa": {
     "countryId": "ZA",
@@ -624,7 +743,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "South Korea": {
     "countryId": "KR",
@@ -632,7 +753,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Spain": {
     "countryId": "ES",
@@ -640,7 +763,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "St. Kitts & Nevis": {
     "countryId": "KN",
@@ -648,7 +773,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "St. Lucia": {
     "countryId": "LC",
@@ -656,7 +783,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Sweden": {
     "countryId": "SE",
@@ -664,7 +793,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Switzerland": {
     "countryId": "CH",
@@ -672,7 +803,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 10,
     "militaryService": "Choice",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Taiwan": {
     "countryId": "TW",
@@ -680,7 +813,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Thailand": {
     "countryId": "TH",
@@ -688,7 +823,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Turkey": {
     "countryId": "TR",
@@ -696,7 +833,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "UAE": {
     "countryId": "AE",
@@ -704,7 +843,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 30,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Selective"
+    "votingStatus": "Selective",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "UK": {
     "countryId": "GB",
@@ -712,7 +853,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "No",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Uruguay": {
     "countryId": "UY",
@@ -720,7 +863,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 3,
     "militaryService": "De jure",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal and Compulsory"
+    "votingStatus": "Universal and Compulsory",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "USA": {
     "countryId": "US",
@@ -728,7 +873,9 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "De jure",
     "taxTreaty": "Several countries",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   },
   "Vietnam": {
     "countryId": "VN",
@@ -736,65 +883,19 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "Yes",
-    "votingStatus": "Universal"
+    "votingStatus": "Universal",
+    "citizenshipByDescent": "Yes, if born to citizens",
+    "citizenshipByMarriage": "After 5 years"
   }
-}
-
-interface Compatibility {
-  overallScore: number;
-  categories: {
-    [key: string]: {
-      score: number;
-      description: string;
-    };
-  };
-}
-
-const calculateCompatibility = (country1: string, country2: string): Compatibility | null => {
-  const c1 = COUNTRY_DATA[country1];
-  const c2 = COUNTRY_DATA[country2];
-
-  if (!c1 || !c2) return null;
-
-  const scores = {
-    legalStatus: c1.dualCitizenship === "Yes" && c2.dualCitizenship === "Yes" ? 100 : 50,
-    residencyRequirements: Math.max(0, 100 - Math.abs(c1.residencyYears - c2.residencyYears) * 10),
-    militaryService: c1.militaryService === "No" && c2.militaryService === "No" ? 100 : 60,
-    taxObligations: c1.taxTreaty === "Yes" && c2.taxTreaty === "Yes" ? 100 : 70,
-    votingRights: c1.votingStatus === c2.votingStatus ? 100 : 75
-  };
-
-  const descriptions = {
-    legalStatus: scores.legalStatus === 100 ? "Both countries allow dual citizenship" : "Some restrictions on dual citizenship",
-    residencyRequirements: `Residency requirements differ by ${Math.abs(c1.residencyYears - c2.residencyYears)} years`,
-    militaryService: scores.militaryService === 100 ? "No mandatory military service" : "Military service obligations may apply",
-    taxObligations: scores.taxObligations === 100 ? "Tax treaty in place between countries" : "Limited tax agreements",
-    votingRights: scores.votingRights === 100 ? "Similar voting rights" : "Different voting regulations"
-  };
-
-  const overallScore = Math.round(
-    Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.keys(scores).length
-  );
-
-  return {
-    overallScore,
-    categories: Object.keys(scores).reduce((acc, key) => ({
-      ...acc,
-      [key]: {
-        score: scores[key as keyof typeof scores],
-        description: descriptions[key as keyof typeof descriptions]
-      }
-    }), {})
-  };
 };
 
 const Index = () => {
   const [country1, setCountry1] = useState("USA");
   const [country2, setCountry2] = useState("Canada");
-  const [compatibility, setCompatibility] = useState<Compatibility | null>(null);
+  const [compatibility, setCompatibility] = useState<ReturnType<typeof calculateCompatibility> | null>(null);
 
   useEffect(() => {
-    const result = calculateCompatibility(country1, country2);
+    const result = calculateCompatibility(country1, country2, COUNTRY_DATA);
     setCompatibility(result);
   }, [country1, country2]);
 
@@ -842,12 +943,12 @@ const Index = () => {
         </div>
 
         <div className="max-w-2xl mx-auto space-y-6">
-          {Object.entries(DEFAULT_CATEGORIES).map(([key, category]) => (
+          {Object.entries(compatibility.categories).map(([key, category]) => (
             <CategoryCard
               key={key}
-              title={category.title}
-              score={compatibility.categories[key].score}
-              description={compatibility.categories[key].description}
+              title={DEFAULT_CATEGORIES[key as keyof typeof DEFAULT_CATEGORIES].title}
+              score={category.score}
+              description={category.description}
               implications={category.implications}
             />
           ))}
