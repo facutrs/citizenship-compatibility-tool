@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React,{ useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -19,12 +19,6 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
     return <XCircle className="text-red-500 h-6 w-6" />;
   };
 
-  const getScoreColor = () => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 50) return "text-amber-600";
-    return "text-red-600";
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -33,21 +27,18 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
     >
       <button 
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full"
+        className="w-full text-left"
       >
         <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
             {getIcon()}
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
           </div>
-          <div className="flex items-center gap-2">
-            <span className={`font-bold ${getScoreColor()}`}>{score}%</span>
-            {isExpanded ? (
-              <ChevronUp className="h-5 w-5 text-gray-500" />
-            ) : (
-              <ChevronDown className="h-5 w-5 text-gray-500" />
-            )}
-          </div>
+          {isExpanded ? (
+            <ChevronUp className="h-5 w-5 text-gray-500" />
+          ) : (
+            <ChevronDown className="h-5 w-5 text-gray-500" />
+          )}
         </div>
       </button>
       
@@ -58,14 +49,16 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
       >
         <div className="space-y-4">
           <p className="text-gray-600">{description}</p>
-          <ul className="space-y-2">
-            {implications.map((implication, index) => (
-              <li key={index} className="text-sm text-gray-500 flex items-start gap-2">
-                <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mt-1.5" />
-                <span>{implication}</span>
-              </li>
-            ))}
-          </ul>
+          {implications.length > 0 && (
+            <ul className="space-y-2">
+              {implications.map((implication, index) => (
+                <li key={index} className="text-sm text-gray-500 flex items-start gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mt-1.5" />
+                  <span>{implication}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </motion.div>
     </motion.div>
