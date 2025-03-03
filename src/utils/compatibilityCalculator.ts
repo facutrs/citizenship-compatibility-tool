@@ -205,12 +205,22 @@ export const getLegalStatusImplications = (country1: string, country2: string, c
 
   // Citizenship by descent
   if (country1Data.citizenshipByDescent && country2Data.citizenshipByDescent) {
-    implications.push(`Citizenship by descent: ${country1} - ${country1Data.citizenshipByDescent}. ${country2} - ${country2Data.citizenshipByDescent}.`);
+    // Check if they're the same or similar
+    if (country1Data.citizenshipByDescent === country2Data.citizenshipByDescent) {
+      implications.push(`Both ${country1} and ${country2} recognize citizenship by descent.`);
+    } else {
+      implications.push(`Citizenship by descent: ${country1} - ${country1Data.citizenshipByDescent}. ${country2} - ${country2Data.citizenshipByDescent}.`);
+    }
   }
 
   // Citizenship by marriage
   if (country1Data.citizenshipByMarriage && country2Data.citizenshipByMarriage) {
-    implications.push(`Citizenship by marriage: In ${country1}, citizenship can be obtained ${country1Data.citizenshipByMarriage.toLowerCase()}. In ${country2}, citizenship can be obtained ${country2Data.citizenshipByMarriage.toLowerCase()}.`);
+    // Check if they're the same time period
+    if (country1Data.citizenshipByMarriage === country2Data.citizenshipByMarriage) {
+      implications.push(`Both ${country1} and ${country2} allow citizenship by marriage ${country1Data.citizenshipByMarriage.toLowerCase()}.`);
+    } else {
+      implications.push(`Citizenship by marriage: In ${country1}, citizenship can be obtained ${country1Data.citizenshipByMarriage.toLowerCase()}. In ${country2}, citizenship can be obtained ${country2Data.citizenshipByMarriage.toLowerCase()}.`);
+    }
   }
 
   return implications;
@@ -218,13 +228,15 @@ export const getLegalStatusImplications = (country1: string, country2: string, c
 
 export const getResidencyImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
   const implications = [];
-
+  
+  if (Math.abs(country1Data.residencyYears - country2Data.residencyYears) <= 2) {
+    implications.push(`The residency requirements are similar between the two countries.`);
+  }
+  
   implications.push(`Both countries allow naturalization after certain periods of residency: ${country1} requires ${country1Data.residencyYears} years, while ${country2} requires ${country2Data.residencyYears} years.`);
   
   if (country1Data.residencyYears === country2Data.residencyYears) {
     implications.push(`Both countries have the same residency requirement for naturalization (${country1Data.residencyYears} years).`);
-  } else if (Math.abs(country1Data.residencyYears - country2Data.residencyYears) <= 2) {
-    implications.push(`The residency requirements are similar between the two countries.`);
   } else if (country1Data.residencyYears > country2Data.residencyYears) {
     implications.push(`${country1} has a longer residency requirement (${country1Data.residencyYears} years) compared to ${country2} (${country2Data.residencyYears} years).`);
   } else {
@@ -244,7 +256,7 @@ export const getMilitaryServiceImplications = (country1: string, country2: strin
       case "No":
         return `${country} does not require military service.`;
       case "De jure":
-        return `${country} has military service requirements on paper but rarely enforces them.`;
+        return `${country} has military service requirements on paper but rarely enforces them in practice.`;
       case "Choice":
         return `${country} offers a choice between military and alternative service.`;
       case "Infrequent":
@@ -269,6 +281,15 @@ export const getMilitaryServiceImplications = (country1: string, country2: strin
 
 export const getTaxObligationsImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
   const implications = [];
+
+  // Add tax residence criteria for both countries
+  if (country1Data.taxationCriteria) {
+    implications.push(`Tax residence in ${country1}: ${country1Data.taxationCriteria}.`);
+  }
+  
+  if (country2Data.taxationCriteria) {
+    implications.push(`Tax residence in ${country2}: ${country2Data.taxationCriteria}.`);
+  }
 
   // Check if USA is one of the countries
   const isUSAInvolved = country1 === "USA" || country2 === "USA";
@@ -305,17 +326,6 @@ export const getTaxObligationsImplications = (country1: string, country2: string
 
 export const getVotingRightsImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
   const implications = [];
-
-  const getVotingDescription = (country: string, status: string) => {
-    if (status === "Universal and Compulsory") {
-      return `${country} has compulsory voting for citizens.`;
-    } else {
-      return `${country} has voluntary voting for citizens.`;
-    }
-  };
-
-  implications.push(getVotingDescription(country1, country1Data.votingStatus));
-  implications.push(getVotingDescription(country2, country2Data.votingStatus));
 
   if (country1Data.votingStatus === "Universal and Compulsory" && country2Data.votingStatus === "Universal and Compulsory") {
     implications.push(`Both countries require compulsory voting. You may need to fulfill voting obligations in both nations.`);

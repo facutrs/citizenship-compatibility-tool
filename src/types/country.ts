@@ -1,4 +1,3 @@
-
 export interface CountryData {
   countryId: string;
   dualCitizenship: "Yes" | "No" | "Conditional";
@@ -6,11 +5,12 @@ export interface CountryData {
   militaryService: "Yes" | "No" | "De jure" | "Infrequent" | "Choice";
   taxTreaty: "Yes" | "No" | "Several countries";
   votingStatus: "Universal" | "Universal and Compulsory" | "Selective";
-  citizenshipByBirth: "Yes" | "No" | "Conditional";
-  citizenshipByDescent: "Yes" | "No";
-  citizenshipByMarriage: string;
-  residencyCriteriaBlurb: string;
-  taxationType: "Residence-based" | "Territorial" | "No personal income tax" | "Citizenship-based";
+  citizenshipByBirth?: "Yes" | "No" | "Conditional";
+  citizenshipByDescent?: string;
+  citizenshipByMarriage?: string;
+  residencyCriteriaBlurb?: string;
+  taxationCriteria?: string;
+  taxationType?: "Residence-based" | "Territorial" | "No personal income tax" | "Citizenship-based";
 }
 
 export const COUNTRY_DATA: Record<string, CountryData> = {
@@ -93,5 +93,3 @@ export const COUNTRY_DATA: Record<string, CountryData> = {
     "taxationType": "Residence-based"
   }
 };
-
-// Add more countries as needed - this is just a subset for the mockup

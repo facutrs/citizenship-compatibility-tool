@@ -48,7 +48,6 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
         className="overflow-hidden"
       >
         <div className="space-y-4">
-          <p className="text-gray-600">{description}</p>
           {implications.length > 0 && (
             <ul className="space-y-2">
               {implications.map((implication, index) => (

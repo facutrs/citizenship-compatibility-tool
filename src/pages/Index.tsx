@@ -50,6 +50,7 @@ interface CountryData {
   votingStatus: string;
   citizenshipByDescent?: string;
   citizenshipByMarriage?: string;
+  taxationCriteria?: string;
 }
 
 // Reduced country data focused on 5 countries
@@ -62,7 +63,8 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "taxTreaty": "Yes",
     "votingStatus": "Universal",
     "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years"
+    "citizenshipByMarriage": "After 3 years",
+    "taxationCriteria": "Based on residence and worldwide income if resident"
   },
   "France": {
     "countryId": "FR",
@@ -72,7 +74,8 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "taxTreaty": "Yes",
     "votingStatus": "Universal",
     "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 5 years"
+    "citizenshipByMarriage": "After 5 years",
+    "taxationCriteria": "Based on residence and worldwide income if resident"
   },
   "Japan": {
     "countryId": "JP",
@@ -82,7 +85,8 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "taxTreaty": "Yes",
     "votingStatus": "Universal",
     "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 5 years"
+    "citizenshipByMarriage": "After 5 years",
+    "taxationCriteria": "Based on residence and worldwide income if resident for over 5 years"
   },
   "UK": {
     "countryId": "GB",
@@ -92,22 +96,24 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "taxTreaty": "Yes",
     "votingStatus": "Universal",
     "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years"
+    "citizenshipByMarriage": "After 3 years",
+    "taxationCriteria": "Based on residence or domicile status"
   },
   "USA": {
     "countryId": "US",
     "dualCitizenship": "Yes",
     "residencyYears": 5,
-    "militaryService": "No",
+    "militaryService": "De jure",
     "taxTreaty": "Yes",
     "votingStatus": "Universal",
     "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years"
+    "citizenshipByMarriage": "After 3 years",
+    "taxationCriteria": "Based on citizenship, taxes worldwide income regardless of residence"
   }
 };
 
 const Index = () => {
-  const [originCountry, setOriginCountry] = useState<string>("");
+  const [originCountry, setOriginCountry] = useState<string>("USA");
   const [destinationCountry, setDestinationCountry] = useState<string>("");
   const [compatibilityScore, setCompatibilityScore] = useState<number | null>(null);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
@@ -230,14 +236,14 @@ const Index = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Citizenship Implications</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Compatibility Implications Between Countries</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {Object.values(categories).map((category) => (
                 <CategoryCard
                   key={category.title}
                   title={category.title}
                   score={compatibilityScore}
-                  description="Compatibility implications between countries"
+                  description=""
                   implications={category.implications}
                 />
               ))}
