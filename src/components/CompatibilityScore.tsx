@@ -55,7 +55,7 @@ const CompatibilityScore = ({ score, country1, country2, country1Id, country2Id 
               style={{ width: `${score}%` }}
             />
           </Progress>
-          <div className="text-sm text-gray-500 mt-2 text-center">Compatibility Score</div>
+          <div className="text-sm text-gray-500 mt-2 text-center">Citizenship Compatibility Score</div>
         </div>
         <div className="flex items-center gap-2 flex-1 justify-end">
           <span className="text-sage-600 font-semibold">{country2}</span>

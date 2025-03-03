@@ -52,7 +52,7 @@ const CategoryCard = ({ title, score, description, implications }: CategoryCardP
             <ul className="space-y-2">
               {implications.map((implication, index) => (
                 <li key={index} className="text-sm text-gray-500 flex items-start gap-2">
-                  <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mt-1.5" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-gray-400 mt-1.5 flex-shrink-0" />
                   <span>{implication}</span>
                 </li>
               ))}
