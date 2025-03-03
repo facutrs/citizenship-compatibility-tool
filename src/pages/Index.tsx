@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
@@ -12,6 +11,7 @@ import {
   getTaxObligationsImplications, 
   getVotingRightsImplications 
 } from "@/utils/compatibilityCalculator";
+import { CountryData, COUNTRY_DATA } from "@/types/country";
 
 // Reduced country list focused on 5 countries
 const COUNTRIES = [
@@ -39,77 +39,6 @@ const DEFAULT_CATEGORIES = {
     title: "Voting Rights",
     implications: [],
   },
-};
-
-interface CountryData {
-  countryId: string;
-  dualCitizenship: "Yes" | "No" | "Conditional";
-  residencyYears: number;
-  militaryService: "Yes" | "No" | "De jure" | "Choice" | "Infrequent";
-  taxTreaty: "Yes" | "No" | "Several countries";
-  votingStatus: string;
-  citizenshipByDescent?: string;
-  citizenshipByMarriage?: string;
-  taxationCriteria?: string;
-}
-
-// Reduced country data focused on 5 countries
-const COUNTRY_DATA: Record<string, CountryData> = {
-  "Canada": {
-    "countryId": "CA",
-    "dualCitizenship": "Yes",
-    "residencyYears": 3,
-    "militaryService": "No",
-    "taxTreaty": "Yes",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years",
-    "taxationCriteria": "Based on residence and worldwide income if resident"
-  },
-  "France": {
-    "countryId": "FR",
-    "dualCitizenship": "Yes",
-    "residencyYears": 5,
-    "militaryService": "No",
-    "taxTreaty": "Yes",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 5 years",
-    "taxationCriteria": "Based on residence and worldwide income if resident"
-  },
-  "Japan": {
-    "countryId": "JP",
-    "dualCitizenship": "No",
-    "residencyYears": 5,
-    "militaryService": "No",
-    "taxTreaty": "Yes",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 5 years",
-    "taxationCriteria": "Based on residence and worldwide income if resident for over 5 years"
-  },
-  "UK": {
-    "countryId": "GB",
-    "dualCitizenship": "Yes",
-    "residencyYears": 5,
-    "militaryService": "No",
-    "taxTreaty": "Yes",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years",
-    "taxationCriteria": "Based on residence or domicile status"
-  },
-  "USA": {
-    "countryId": "US",
-    "dualCitizenship": "Yes",
-    "residencyYears": 5,
-    "militaryService": "De jure",
-    "taxTreaty": "Yes",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 3 years",
-    "taxationCriteria": "Based on citizenship, taxes worldwide income regardless of residence"
-  }
 };
 
 const Index = () => {

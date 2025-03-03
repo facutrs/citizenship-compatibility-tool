@@ -1,3 +1,4 @@
+
 export interface CountryData {
   countryId: string;
   dualCitizenship: "Yes" | "No" | "Conditional";
@@ -90,6 +91,32 @@ export const COUNTRY_DATA: Record<string, CountryData> = {
     "citizenshipByDescent": "Yes",
     "citizenshipByMarriage": "3 years",
     "residencyCriteriaBlurb": "Foreign individuals are considered residents if they have their domicile in Japan, or have resided in Japan for a continuous period of at least 1 year.",
+    "taxationType": "Residence-based"
+  },
+  "France": {
+    "countryId": "FR",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal",
+    "citizenshipByBirth": "No",
+    "citizenshipByDescent": "Yes",
+    "citizenshipByMarriage": "4 years",
+    "residencyCriteriaBlurb": "Foreign individuals are considered tax residents if they have a permanent home in France, if their primary place of residence is in France, or if they perform professional activities in France.",
+    "taxationType": "Residence-based"
+  },
+  "UK": {
+    "countryId": "GB",
+    "dualCitizenship": "Yes",
+    "residencyYears": 5,
+    "militaryService": "No",
+    "taxTreaty": "Yes",
+    "votingStatus": "Universal",
+    "citizenshipByBirth": "No",
+    "citizenshipByDescent": "Yes",
+    "citizenshipByMarriage": "3 years",
+    "residencyCriteriaBlurb": "Foreign individuals are considered tax residents based on the Statutory Residence Test, which considers factors such as days spent in the UK, ties to the UK, and whether they have a home in the UK.",
     "taxationType": "Residence-based"
   }
 };
