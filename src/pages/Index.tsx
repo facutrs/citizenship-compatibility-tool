@@ -14,10 +14,8 @@ import {
 } from "@/utils/compatibilityCalculator";
 import { CountryData, COUNTRY_DATA } from "@/types/country";
 
-// Reduced country list focused on 5 countries
-const COUNTRIES = [
-  "Canada", "France", "Japan", "UK", "USA"
-];
+// Get all country names from the COUNTRY_DATA object
+const COUNTRIES = Object.keys(COUNTRY_DATA).sort();
 
 const DEFAULT_CATEGORIES = {
   legalStatus: {
