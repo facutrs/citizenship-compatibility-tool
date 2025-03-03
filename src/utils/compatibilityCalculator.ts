@@ -78,14 +78,17 @@ export const calculateCompatibility = (
   if (country1.militaryService === "No" && country2.militaryService === "No") {
     militaryServiceScore = 100;
   } else if (country1.militaryService === "De jure" && country2.militaryService === "De jure") {
-    militaryServiceScore = 100; // Updated: Both countries have de jure service = 100% match (green)
+    militaryServiceScore = 100; // Both countries have de jure service = 100% match (green)
   } else if (
     (country1.militaryService === "No" && country2.militaryService === "De jure") ||
     (country1.militaryService === "De jure" && country2.militaryService === "No")
   ) {
-    militaryServiceScore = 80;
-  } else if (country1.militaryService === "De jure" && country2.militaryService === "De jure") {
-    militaryServiceScore = 70;
+    militaryServiceScore = 80; // When one has no service and the other has de jure service = 80% match (green)
+  } else if (
+    (country1.militaryService === "No" && country2.militaryService === "Choice") ||
+    (country1.militaryService === "Choice" && country2.militaryService === "No")
+  ) {
+    militaryServiceScore = 90;
   } else if (
     (country1.militaryService === "No" && country2.militaryService === "Infrequent") ||
     (country1.militaryService === "Infrequent" && country2.militaryService === "No")
@@ -95,12 +98,7 @@ export const calculateCompatibility = (
     (country1.militaryService === "Infrequent" && country2.militaryService === "De jure") ||
     (country1.militaryService === "De jure" && country2.militaryService === "Infrequent")
   ) {
-    militaryServiceScore = 65;
-  } else if (
-    (country1.militaryService === "No" && country2.militaryService === "Choice") ||
-    (country1.militaryService === "Choice" && country2.militaryService === "No")
-  ) {
-    militaryServiceScore = 90;
+    militaryServiceScore = 80; // Updated: Both have either de jure or infrequent service = 80% match (green)
   } else if (
     (country1.militaryService === "Choice" && country2.militaryService === "De jure") ||
     (country1.militaryService === "De jure" && country2.militaryService === "Choice")
