@@ -216,7 +216,7 @@ export const getLegalStatusImplications = (country1: string, country2: string, c
     if (country1Data.citizenshipByMarriage === country2Data.citizenshipByMarriage) {
       implications.push(`Both ${country1} and ${country2} allow citizenship by marriage after ${country1Data.citizenshipByMarriage.toLowerCase()} of marriage.`);
     } else {
-      implications.push(`Citizenship by marriage: In ${country1}, citizenship can be obtained ${country1Data.citizenshipByMarriage.toLowerCase()} of marriage. In ${country2}, citizenship can be obtained ${country2Data.citizenshipByMarriage.toLowerCase()} of marriage.`);
+      implications.push(`Citizenship by marriage: In ${country1}, citizenship can be obtained after ${country1Data.citizenshipByMarriage.toLowerCase()} of marriage. In ${country2}, citizenship can be obtained after ${country2Data.citizenshipByMarriage.toLowerCase()} of marriage.`);
     }
   }
 
