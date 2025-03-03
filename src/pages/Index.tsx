@@ -119,40 +119,46 @@ const Index = () => {
       
       // Simulate a calculation delay for better UX
       const timer = setTimeout(() => {
-        // Calculate compatibility score
-        const score = calculateCompatibility(originCountry, destinationCountry, COUNTRY_DATA);
-        setCompatibilityScore(score);
+        // Get country data
+        const originCountryData = COUNTRY_DATA[originCountry];
+        const destinationCountryData = COUNTRY_DATA[destinationCountry];
+        
+        if (originCountryData && destinationCountryData) {
+          // Calculate compatibility score
+          const compatibility = calculateCompatibility(originCountryData, destinationCountryData);
+          setCompatibilityScore(compatibility.totalScore);
 
-        // Calculate implications for each category
-        const legalImplications = getLegalStatusImplications(originCountry, destinationCountry, COUNTRY_DATA);
-        const residencyImplications = getResidencyImplications(originCountry, destinationCountry, COUNTRY_DATA);
-        const militaryImplications = getMilitaryServiceImplications(originCountry, destinationCountry, COUNTRY_DATA);
-        const taxImplications = getTaxObligationsImplications(originCountry, destinationCountry, COUNTRY_DATA);
-        const votingImplications = getVotingRightsImplications(originCountry, destinationCountry, COUNTRY_DATA);
+          // Calculate implications for each category
+          const legalImplications = getLegalStatusImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
+          const residencyImplications = getResidencyImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
+          const militaryImplications = getMilitaryServiceImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
+          const taxImplications = getTaxObligationsImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
+          const votingImplications = getVotingRightsImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
 
-        // Update categories with implications
-        setCategories({
-          legalStatus: {
-            title: "Legal Status",
-            implications: legalImplications,
-          },
-          residency: {
-            title: "Residency",
-            implications: residencyImplications,
-          },
-          militaryService: {
-            title: "Military Service",
-            implications: militaryImplications,
-          },
-          taxObligations: {
-            title: "Tax Obligations",
-            implications: taxImplications,
-          },
-          votingRights: {
-            title: "Voting Rights",
-            implications: votingImplications,
-          },
-        });
+          // Update categories with implications
+          setCategories({
+            legalStatus: {
+              title: "Legal Status",
+              implications: legalImplications,
+            },
+            residency: {
+              title: "Residency",
+              implications: residencyImplications,
+            },
+            militaryService: {
+              title: "Military Service",
+              implications: militaryImplications,
+            },
+            taxObligations: {
+              title: "Tax Obligations",
+              implications: taxImplications,
+            },
+            votingRights: {
+              title: "Voting Rights",
+              implications: votingImplications,
+            },
+          });
+        }
 
         setIsCalculating(false);
       }, 1000);
@@ -187,14 +193,17 @@ const Index = () => {
             <CountrySelector
               label="Origin Country"
               countries={COUNTRIES}
-              selectedCountry={originCountry}
+              value={originCountry}
               onChange={handleOriginChange}
+              type="primary"
             />
             <CountrySelector
               label="Destination Country"
               countries={COUNTRIES}
-              selectedCountry={destinationCountry}
+              value={destinationCountry}
               onChange={handleDestinationChange}
+              otherCountry={originCountry}
+              type="secondary"
             />
           </div>
 
@@ -204,7 +213,13 @@ const Index = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <CompatibilityScore score={compatibilityScore} isCalculating={isCalculating} />
+              <CompatibilityScore 
+                score={compatibilityScore}
+                country1={originCountry}
+                country2={destinationCountry}
+                country1Id={originCountry ? COUNTRY_DATA[originCountry].countryId : undefined}
+                country2Id={destinationCountry ? COUNTRY_DATA[destinationCountry].countryId : undefined}
+              />
             </motion.div>
           )}
         </div>
@@ -221,6 +236,8 @@ const Index = () => {
                 <CategoryCard
                   key={category.title}
                   title={category.title}
+                  score={compatibilityScore}
+                  description="Compatibility implications between countries"
                   implications={category.implications}
                 />
               ))}
