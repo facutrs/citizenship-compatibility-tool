@@ -6,16 +6,17 @@ import { CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp } from "lu
 interface CategoryCardProps {
   title: string;
   score: number;
+  categoryScore: number; // Add categoryScore prop
   description: string;
   implications: string[];
 }
 
-const CategoryCard = ({ title, score, description, implications }: CategoryCardProps) => {
+const CategoryCard = ({ title, score, categoryScore, description, implications }: CategoryCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const getIcon = () => {
-    if (score >= 80) return <CheckCircle2 className="text-green-500 h-6 w-6" />;
-    if (score >= 50) return <AlertTriangle className="text-amber-500 h-6 w-6" />;
+    if (categoryScore >= 80) return <CheckCircle2 className="text-green-500 h-6 w-6" />;
+    if (categoryScore >= 50) return <AlertTriangle className="text-amber-500 h-6 w-6" />;
     return <XCircle className="text-red-500 h-6 w-6" />;
   };
 

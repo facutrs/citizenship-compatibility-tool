@@ -21,22 +21,27 @@ const DEFAULT_CATEGORIES = {
   legalStatus: {
     title: "Legal Status",
     implications: [],
+    score: 0,
   },
   residency: {
     title: "Residency",
     implications: [],
+    score: 0,
   },
   militaryService: {
     title: "Military Service",
     implications: [],
+    score: 0,
   },
   taxObligations: {
     title: "Tax Obligations",
     implications: [],
+    score: 0,
   },
   votingRights: {
     title: "Voting Rights",
     implications: [],
+    score: 0,
   },
 };
 
@@ -69,27 +74,32 @@ const Index = () => {
           const taxImplications = getTaxObligationsImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
           const votingImplications = getVotingRightsImplications(originCountry, destinationCountry, originCountryData, destinationCountryData);
 
-          // Update categories with implications
+          // Update categories with implications and their individual scores
           setCategories({
             legalStatus: {
               title: "Legal Status",
               implications: legalImplications,
+              score: compatibility.categories.legalStatus,
             },
             residency: {
               title: "Residency",
               implications: residencyImplications,
+              score: compatibility.categories.residency,
             },
             militaryService: {
               title: "Military Service",
               implications: militaryImplications,
+              score: compatibility.categories.militaryService,
             },
             taxObligations: {
               title: "Tax Obligations",
               implications: taxImplications,
+              score: compatibility.categories.taxObligations,
             },
             votingRights: {
               title: "Voting Rights",
               implications: votingImplications,
+              score: compatibility.categories.votingRights,
             },
           });
         }
@@ -171,6 +181,7 @@ const Index = () => {
                   key={category.title}
                   title={category.title}
                   score={compatibilityScore}
+                  categoryScore={category.score}
                   description=""
                   implications={category.implications}
                 />
