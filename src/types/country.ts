@@ -1,4 +1,3 @@
-
 export interface CountryData {
   countryId: string;
   dualCitizenship: "Yes" | "No" | "Conditional";
@@ -136,7 +135,7 @@ export const COUNTRY_DATA: Record<string, CountryData> = {
     "countryId": "BR",
     "dualCitizenship": "Yes",
     "residencyYears": 4,
-    "militaryService": "Yes",
+    "militaryService": "De jure",
     "taxTreaty": "Yes",
     "votingStatus": "Universal and Compulsory",
     "citizenshipByBirth": "Yes",
@@ -1095,4 +1094,3 @@ export const COUNTRY_DATA: Record<string, CountryData> = {
     "taxationType": "Residence-based"
   }
 };
-

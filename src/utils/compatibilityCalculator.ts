@@ -33,10 +33,10 @@ export const calculateCompatibility = (
     };
   }
 
-  // Legal Status score
+  // Legal Status score - Updated logic
   let legalStatusScore = 0;
   if (country1.dualCitizenship === "Yes" && country2.dualCitizenship === "Yes") {
-    legalStatusScore = 100;
+    legalStatusScore = 100; // If both countries allow dual citizenship, score is 100%
   } else if (
     (country1.dualCitizenship === "Yes" && country2.dualCitizenship === "Conditional") ||
     (country1.dualCitizenship === "Conditional" && country2.dualCitizenship === "Yes")
@@ -58,13 +58,13 @@ export const calculateCompatibility = (
     legalStatusScore = 0;
   }
 
-  // Residency Requirements score
+  // Residency Requirements score - Updated logic
   const residencyDiff = Math.abs(country1.residencyYears - country2.residencyYears);
   let residencyScore = 0;
   if (residencyDiff === 0) {
     residencyScore = 100;
   } else if (residencyDiff <= 2) {
-    residencyScore = 85;
+    residencyScore = 100; // Similar residency requirements now get 100%
   } else if (residencyDiff <= 5) {
     residencyScore = 70;
   } else if (residencyDiff <= 10) {
@@ -150,7 +150,7 @@ export const calculateCompatibility = (
     taxObligationsScore = 50;
   }
 
-  // Voting Rights score
+  // Voting Rights score - Updated logic
   let votingRightsScore = 0;
   if (
     country1.votingStatus === country2.votingStatus
@@ -160,7 +160,7 @@ export const calculateCompatibility = (
     (country1.votingStatus === "Universal" && country2.votingStatus === "Universal and Compulsory") ||
     (country1.votingStatus === "Universal and Compulsory" && country2.votingStatus === "Universal")
   ) {
-    votingRightsScore = 70; // If one is compulsory and one is voluntary, it's not a perfect match
+    votingRightsScore = 70; // If one is compulsory and one is voluntary, it's not a perfect match (yellow)
   } else {
     votingRightsScore = 50;
   }
