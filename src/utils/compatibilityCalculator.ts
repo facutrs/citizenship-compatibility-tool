@@ -77,6 +77,8 @@ export const calculateCompatibility = (
   let militaryServiceScore = 0;
   if (country1.militaryService === "No" && country2.militaryService === "No") {
     militaryServiceScore = 100;
+  } else if (country1.militaryService === "De jure" && country2.militaryService === "De jure") {
+    militaryServiceScore = 100; // Updated: Both countries have de jure service = 100% match (green)
   } else if (
     (country1.militaryService === "No" && country2.militaryService === "De jure") ||
     (country1.militaryService === "De jure" && country2.militaryService === "No")
