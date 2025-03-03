@@ -1,3 +1,4 @@
+<lov-code>
 import React, { useState, useEffect } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
@@ -820,4 +821,4 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus
+    
