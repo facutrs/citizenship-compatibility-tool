@@ -3,7 +3,14 @@ import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
 import CategoryCard from "@/components/CategoryCard";
 import { motion } from "framer-motion";
-import { calculateCompatibility } from "@/utils/compatibilityCalculator";
+import { 
+  calculateCompatibility, 
+  getLegalStatusImplications, 
+  getResidencyImplications, 
+  getMilitaryServiceImplications, 
+  getTaxObligationsImplications, 
+  getVotingRightsImplications 
+} from "@/utils/compatibilityCalculator";
 
 const COUNTRIES = [
   "Anguilla", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", 
@@ -813,9 +820,4 @@ const COUNTRY_DATA: Record<string, CountryData> = {
     "residencyYears": 5,
     "militaryService": "Yes",
     "taxTreaty": "No",
-    "votingStatus": "Universal",
-    "citizenshipByDescent": "Yes, if born to citizens",
-    "citizenshipByMarriage": "After 5 years"
-  },
-  "Thailand": {
-    "countryId": "
+    "votingStatus

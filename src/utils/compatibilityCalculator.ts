@@ -1,360 +1,331 @@
 
-interface CountryData {
-  countryId: string;
-  dualCitizenship: "Yes" | "No" | "Conditional";
-  residencyYears: number;
-  militaryService: "Yes" | "No" | "De jure" | "Choice" | "Infrequent";
-  taxTreaty: "Yes" | "No" | "Several countries";
-  votingStatus: string;
-  citizenshipByDescent?: string;
-  citizenshipByMarriage?: string;
-}
+import { CountryData } from "@/types/country";
 
-interface CategoryResult {
-  score: number;
-  description: string;
-  implications: string[];
-}
-
-interface CompatibilityResult {
-  overallScore: number;
-  categories: {
-    legalStatus: CategoryResult;
-    residency: CategoryResult;
-    militaryService: CategoryResult;
-    taxObligations: CategoryResult;
-    votingRights: CategoryResult;
-  };
-}
-
-// Helper functions for calculating specific category compatibility
-const calculateLegalStatusScore = (c1: CountryData, c2: CountryData): number => {
-  // Base score on dual citizenship policies
-  if (c1.dualCitizenship === "Yes" && c2.dualCitizenship === "Yes") {
-    return 100;
-  } else if (c1.dualCitizenship === "No" && c2.dualCitizenship === "No") {
-    return 20; // Very incompatible
-  } else if ((c1.dualCitizenship === "No" && c2.dualCitizenship === "Yes") || 
-             (c1.dualCitizenship === "Yes" && c2.dualCitizenship === "No")) {
-    return 40; // One country allows, one doesn't
-  } else {
-    return 70; // Conditional cases
-  }
-};
-
-const calculateResidencyScore = (c1: CountryData, c2: CountryData): number => {
-  // Calculate based on difference in residency years
-  const yearDifference = Math.abs(c1.residencyYears - c2.residencyYears);
-  
-  if (yearDifference === 0) return 100;
-  if (yearDifference <= 2) return 90;
-  if (yearDifference <= 4) return 80;
-  if (yearDifference <= 6) return 70;
-  if (yearDifference <= 8) return 60;
-  return 50;
-};
-
-const calculateMilitaryServiceScore = (c1: CountryData, c2: CountryData): number => {
-  // Both countries don't require military service
-  if (c1.militaryService === "No" && c2.militaryService === "No") {
-    return 100;
-  }
-  
-  // Both countries require military service
-  if (c1.militaryService === "Yes" && c2.militaryService === "Yes") {
-    return 40; // Potential conflict
-  }
-  
-  // One requires, one doesn't
-  if ((c1.militaryService === "Yes" && c2.militaryService === "No") ||
-      (c1.militaryService === "No" && c2.militaryService === "Yes")) {
-    return 60;
-  }
-  
-  // At least one is De jure (on paper but not enforced)
-  if (c1.militaryService === "De jure" || c2.militaryService === "De jure") {
-    return 80;
-  }
-  
-  // Other combinations
-  return 70;
-};
-
-const calculateTaxScore = (c1: CountryData, c2: CountryData): number => {
-  // Both have tax treaties
-  if (c1.taxTreaty === "Yes" && c2.taxTreaty === "Yes") {
-    return 100;
-  }
-  
-  // Neither has tax treaties
-  if (c1.taxTreaty === "No" && c2.taxTreaty === "No") {
-    return 60;
-  }
-  
-  // One has tax treaty, one doesn't
-  if ((c1.taxTreaty === "Yes" && c2.taxTreaty === "No") ||
-      (c1.taxTreaty === "No" && c2.taxTreaty === "Yes")) {
-    return 70;
-  }
-  
-  // Special cases with multiple treaties
-  if (c1.taxTreaty === "Several countries" || c2.taxTreaty === "Several countries") {
-    return 85;
-  }
-  
-  return 75;
-};
-
-const calculateVotingScore = (c1: CountryData, c2: CountryData): number => {
-  // Exact same voting system
-  if (c1.votingStatus === c2.votingStatus) {
-    return 100;
-  }
-  
-  // Both universal but one is compulsory
-  if ((c1.votingStatus === "Universal" && c2.votingStatus === "Universal and Compulsory") ||
-      (c1.votingStatus === "Universal and Compulsory" && c2.votingStatus === "Universal")) {
-    return 80;
-  }
-  
-  // Any other combinations
-  return 70;
-};
-
-const getLegalStatusDescription = (c1: CountryData, c2: CountryData): string => {
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-
-  if (c1.dualCitizenship === "Yes" && c2.dualCitizenship === "Yes") {
-    return `Both ${country1} and ${country2} allow dual citizenship without restrictions.`;
-  } else if (c1.dualCitizenship === "No" && c2.dualCitizenship === "No") {
-    return `Neither ${country1} nor ${country2} allows dual citizenship. You would need to renounce one citizenship to acquire the other.`;
-  } else if (c1.dualCitizenship === "No") {
-    return `${country1} does not allow dual citizenship, while ${country2} does. You would need to renounce your ${country2} citizenship to become a citizen of ${country1}.`;
-  } else if (c2.dualCitizenship === "No") {
-    return `${country2} does not allow dual citizenship, while ${country1} does. You would need to renounce your ${country1} citizenship to become a citizen of ${country2}.`;
-  } else {
-    return `One or both countries have conditional dual citizenship policies that may require special permissions or have restrictions.`;
-  }
-};
-
-const getCountryName = (countryId: string): string => {
-  // This is a simplified function, in real implementation 
-  // we would have a complete mapping of country IDs to names
-  return countryId;
-};
-
-const getLegalStatusImplications = (c1: CountryData, c2: CountryData): string[] => {
-  const implications: string[] = [];
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-  
-  // Add citizenship by descent information
-  if (c1.citizenshipByDescent && c2.citizenshipByDescent) {
-    implications.push(`${country1} grants citizenship by descent ${c1.citizenshipByDescent.toLowerCase()}, while ${country2} grants it ${c2.citizenshipByDescent.toLowerCase()}.`);
-  }
-  
-  // Add citizenship by marriage information
-  if (c1.citizenshipByMarriage && c2.citizenshipByMarriage) {
-    implications.push(`${country1} allows citizenship through marriage ${c1.citizenshipByMarriage.toLowerCase()}, while ${country2} allows it ${c2.citizenshipByMarriage.toLowerCase()}.`);
-  }
-  
-  return implications;
-};
-
-const getResidencyDescription = (c1: CountryData, c2: CountryData): string => {
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-  
-  const yearDifference = Math.abs(c1.residencyYears - c2.residencyYears);
-  
-  if (yearDifference === 0) {
-    return `Both countries require ${c1.residencyYears} years of legal residence before applying for naturalization.`;
-  } else {
-    return `Both countries allow naturalization after a period of legal residence. ${country1} requires ${c1.residencyYears} years of residency, while ${country2} requires ${c2.residencyYears} years.`;
-  }
-};
-
-const getMilitaryServiceDescription = (c1: CountryData, c2: CountryData): string => {
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-
-  if (c1.militaryService === "No" && c2.militaryService === "No") {
-    return `Neither ${country1} nor ${country2} has mandatory military service requirements.`;
-  } else if (c1.militaryService === "Yes" && c2.militaryService === "Yes") {
-    return `Both ${country1} and ${country2} have mandatory military service requirements, which could create conflicts for dual citizens.`;
-  } else if (c1.militaryService === "Yes") {
-    return `${country1} has mandatory military service while ${country2} does not. This could create obligations for dual citizens.`;
-  } else if (c2.militaryService === "Yes") {
-    return `${country2} has mandatory military service while ${country1} does not. This could create obligations for dual citizens.`;
-  } else if (c1.militaryService === "De jure" && c2.militaryService === "De jure") {
-    return `Both ${country1} and ${country2} have military service laws on the books but don't actively enforce them in practice.`;
-  } else if (c1.militaryService === "De jure") {
-    return `${country1} has military service laws but doesn't actively enforce them, while ${country2} has ${c2.militaryService.toLowerCase()} military service.`;
-  } else if (c2.militaryService === "De jure") {
-    return `${country2} has military service laws but doesn't actively enforce them, while ${country1} has ${c1.militaryService.toLowerCase()} military service.`;
-  } else if (c1.militaryService === "Choice") {
-    return `${country1} offers citizens a choice regarding military service, while ${country2} has ${c2.militaryService.toLowerCase()} military service.`;
-  } else if (c2.militaryService === "Choice") {
-    return `${country2} offers citizens a choice regarding military service, while ${country1} has ${c1.militaryService.toLowerCase()} military service.`;
-  } else {
-    return `Military service requirements differ between ${country1} (${c1.militaryService.toLowerCase()}) and ${country2} (${c2.militaryService.toLowerCase()}).`;
-  }
-};
-
-const getTaxDescription = (c1: CountryData, c2: CountryData): string => {
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-
-  // Check USA specific tax treaties
-  let usaTaxInfo = "";
-  if (country1 === "USA" && c2.taxTreaty === "Yes") {
-    usaTaxInfo = ` USA has a tax treaty with ${country2}, which helps prevent double taxation.`;
-  } else if (country2 === "USA" && c1.taxTreaty === "Yes") {
-    usaTaxInfo = ` USA has a tax treaty with ${country1}, which helps prevent double taxation.`;
-  }
-
-  if (c1.taxTreaty === "Yes" && c2.taxTreaty === "Yes") {
-    return `A tax treaty exists between ${country1} and ${country2}, reducing the risk of double taxation.${usaTaxInfo}`;
-  } else if (c1.taxTreaty === "No" && c2.taxTreaty === "No") {
-    return `Neither ${country1} nor ${country2} has extensive tax treaties, which could lead to more complex tax situations for dual citizens.`;
-  } else if (c1.taxTreaty === "Several countries" && c2.taxTreaty === "Several countries") {
-    return `Both ${country1} and ${country2} have tax treaties with multiple countries, which might provide some tax benefits depending on your specific situation.${usaTaxInfo}`;
-  } else if (c1.taxTreaty === "Several countries") {
-    return `${country1} has tax treaties with multiple countries, while ${country2}'s tax treaty status is more limited. This could affect your tax obligations as a dual citizen.${usaTaxInfo}`;
-  } else if (c2.taxTreaty === "Several countries") {
-    return `${country2} has tax treaties with multiple countries, while ${country1}'s tax treaty status is more limited. This could affect your tax obligations as a dual citizen.${usaTaxInfo}`;
-  } else if (c1.taxTreaty === "Yes") {
-    return `${country1} has tax treaties that could benefit citizens, while ${country2} does not have extensive tax treaties.${usaTaxInfo}`;
-  } else if (c2.taxTreaty === "Yes") {
-    return `${country2} has tax treaties that could benefit citizens, while ${country1} does not have extensive tax treaties.${usaTaxInfo}`;
-  } else {
-    return `Tax treaty status differs between ${country1} and ${country2}, potentially creating complexities in tax obligations for dual citizens.${usaTaxInfo}`;
-  }
-};
-
-const getVotingDescription = (c1: CountryData, c2: CountryData): string => {
-  const country1 = c1.countryId === "US" ? "USA" : 
-                  c1.countryId === "GB" ? "UK" : 
-                  c1.countryId === "AE" ? "UAE" : 
-                  getCountryName(c1.countryId);
-
-  const country2 = c2.countryId === "US" ? "USA" : 
-                  c2.countryId === "GB" ? "UK" : 
-                  c2.countryId === "AE" ? "UAE" : 
-                  getCountryName(c2.countryId);
-
-  if (c1.votingStatus === c2.votingStatus) {
-    if (c1.votingStatus === "Universal and Compulsory") {
-      return `Both ${country1} and ${country2} have universal and compulsory voting systems, requiring eligible citizens to vote.`;
-    } else {
-      return `Both ${country1} and ${country2} have similar ${c1.votingStatus.toLowerCase()} voting systems.`;
-    }
-  } else if ((c1.votingStatus === "Universal" && c2.votingStatus === "Universal and Compulsory") ||
-             (c1.votingStatus === "Universal and Compulsory" && c2.votingStatus === "Universal")) {
-    const compulsory = c1.votingStatus === "Universal and Compulsory" ? country1 : country2;
-    const nonCompulsory = c1.votingStatus === "Universal" ? country1 : country2;
-    return `${compulsory} has compulsory voting, requiring eligible citizens to participate in elections, while ${nonCompulsory} has voluntary voting where citizens can choose whether to vote.`;
-  } else {
-    return `${country1} has a ${c1.votingStatus.toLowerCase()} voting system, while ${country2} has a ${c2.votingStatus.toLowerCase()} system. This creates different expectations and requirements for citizens.`;
-  }
-};
-
+/**
+ * Calculate the compatibility score between two countries for dual citizenship.
+ * 
+ * @param country1 - Data for the first country
+ * @param country2 - Data for the second country
+ * @returns A number between 0 and 100 representing compatibility percentage
+ */
 export const calculateCompatibility = (
-  country1: string,
-  country2: string,
-  countryData: Record<string, CountryData>
-): CompatibilityResult | null => {
-  const c1 = countryData[country1];
-  const c2 = countryData[country2];
+  country1: CountryData | null,
+  country2: CountryData | null
+): {
+  totalScore: number;
+  categories: {
+    legalStatus: number;
+    residency: number;
+    militaryService: number;
+    taxObligations: number;
+    votingRights: number;
+  };
+} => {
+  if (!country1 || !country2) {
+    return {
+      totalScore: 0,
+      categories: {
+        legalStatus: 0,
+        residency: 0,
+        militaryService: 0,
+        taxObligations: 0,
+        votingRights: 0,
+      },
+    };
+  }
 
-  if (!c1 || !c2) return null;
+  // Legal Status score
+  let legalStatusScore = 0;
+  if (country1.dualCitizenship === "Yes" && country2.dualCitizenship === "Yes") {
+    legalStatusScore = 100;
+  } else if (
+    (country1.dualCitizenship === "Yes" && country2.dualCitizenship === "Conditional") ||
+    (country1.dualCitizenship === "Conditional" && country2.dualCitizenship === "Yes")
+  ) {
+    legalStatusScore = 70;
+  } else if (country1.dualCitizenship === "Conditional" && country2.dualCitizenship === "Conditional") {
+    legalStatusScore = 50;
+  } else if (
+    (country1.dualCitizenship === "Yes" && country2.dualCitizenship === "No") ||
+    (country1.dualCitizenship === "No" && country2.dualCitizenship === "Yes")
+  ) {
+    legalStatusScore = 25;
+  } else if (
+    (country1.dualCitizenship === "Conditional" && country2.dualCitizenship === "No") ||
+    (country1.dualCitizenship === "No" && country2.dualCitizenship === "Conditional")
+  ) {
+    legalStatusScore = 15;
+  } else {
+    legalStatusScore = 0;
+  }
 
-  // Calculate scores for each category
-  const legalStatusScore = calculateLegalStatusScore(c1, c2);
-  const residencyScore = calculateResidencyScore(c1, c2);
-  const militaryServiceScore = calculateMilitaryServiceScore(c1, c2);
-  const taxScore = calculateTaxScore(c1, c2);
-  const votingScore = calculateVotingScore(c1, c2);
+  // Residency Requirements score
+  const residencyDiff = Math.abs(country1.residencyYears - country2.residencyYears);
+  let residencyScore = 0;
+  if (residencyDiff === 0) {
+    residencyScore = 100;
+  } else if (residencyDiff <= 2) {
+    residencyScore = 85;
+  } else if (residencyDiff <= 5) {
+    residencyScore = 70;
+  } else if (residencyDiff <= 10) {
+    residencyScore = 50;
+  } else {
+    residencyScore = 30;
+  }
 
-  // Get descriptions for each category
-  const legalStatusDescription = getLegalStatusDescription(c1, c2);
-  const residencyDescription = getResidencyDescription(c1, c2);
-  const militaryServiceDescription = getMilitaryServiceDescription(c1, c2);
-  const taxDescription = getTaxDescription(c1, c2);
-  const votingDescription = getVotingDescription(c1, c2);
+  // Military Service score
+  let militaryServiceScore = 0;
+  if (country1.militaryService === "No" && country2.militaryService === "No") {
+    militaryServiceScore = 100;
+  } else if (
+    (country1.militaryService === "No" && country2.militaryService === "De jure") ||
+    (country1.militaryService === "De jure" && country2.militaryService === "No")
+  ) {
+    militaryServiceScore = 80;
+  } else if (country1.militaryService === "De jure" && country2.militaryService === "De jure") {
+    militaryServiceScore = 70;
+  } else if (
+    (country1.militaryService === "No" && country2.militaryService === "Infrequent") ||
+    (country1.militaryService === "Infrequent" && country2.militaryService === "No")
+  ) {
+    militaryServiceScore = 85;
+  } else if (
+    (country1.militaryService === "Infrequent" && country2.militaryService === "De jure") ||
+    (country1.militaryService === "De jure" && country2.militaryService === "Infrequent")
+  ) {
+    militaryServiceScore = 65;
+  } else if (
+    (country1.militaryService === "No" && country2.militaryService === "Choice") ||
+    (country1.militaryService === "Choice" && country2.militaryService === "No")
+  ) {
+    militaryServiceScore = 90;
+  } else if (
+    (country1.militaryService === "Choice" && country2.militaryService === "De jure") ||
+    (country1.militaryService === "De jure" && country2.militaryService === "Choice")
+  ) {
+    militaryServiceScore = 75;
+  } else if (
+    (country1.militaryService === "No" && country2.militaryService === "Yes") ||
+    (country1.militaryService === "Yes" && country2.militaryService === "No")
+  ) {
+    militaryServiceScore = 40;
+  } else if (
+    (country1.militaryService === "De jure" && country2.militaryService === "Yes") ||
+    (country1.militaryService === "Yes" && country2.militaryService === "De jure")
+  ) {
+    militaryServiceScore = 30;
+  } else if (
+    (country1.militaryService === "Infrequent" && country2.militaryService === "Yes") ||
+    (country1.militaryService === "Yes" && country2.militaryService === "Infrequent")
+  ) {
+    militaryServiceScore = 35;
+  } else if (
+    (country1.militaryService === "Choice" && country2.militaryService === "Yes") ||
+    (country1.militaryService === "Yes" && country2.militaryService === "Choice")
+  ) {
+    militaryServiceScore = 45;
+  } else if (country1.militaryService === "Yes" && country2.militaryService === "Yes") {
+    militaryServiceScore = 20;
+  } else {
+    militaryServiceScore = 50;
+  }
 
-  // Get implications for each category
-  const legalStatusImplications = getLegalStatusImplications(c1, c2);
+  // Tax Obligations score
+  let taxObligationsScore = 0;
+  if (country1.taxTreaty === "Yes" && country2.taxTreaty === "Yes") {
+    taxObligationsScore = 100;
+  } else if (
+    (country1.taxTreaty === "Yes" && country2.taxTreaty === "No") ||
+    (country1.taxTreaty === "No" && country2.taxTreaty === "Yes")
+  ) {
+    taxObligationsScore = 60;
+  } else if (country1.taxTreaty === "No" && country2.taxTreaty === "No") {
+    taxObligationsScore = 40;
+  } else if (
+    country1.taxTreaty === "Several countries" || 
+    country2.taxTreaty === "Several countries"
+  ) {
+    taxObligationsScore = 80;
+  } else {
+    taxObligationsScore = 50;
+  }
 
-  // Calculate overall score (average of all category scores)
-  const overallScore = Math.round(
-    (legalStatusScore + residencyScore + militaryServiceScore + taxScore + votingScore) / 5
+  // Voting Rights score
+  let votingRightsScore = 0;
+  if (
+    country1.votingStatus === country2.votingStatus
+  ) {
+    votingRightsScore = 100;
+  } else if (
+    (country1.votingStatus === "Universal" && country2.votingStatus === "Universal and Compulsory") ||
+    (country1.votingStatus === "Universal and Compulsory" && country2.votingStatus === "Universal")
+  ) {
+    votingRightsScore = 70; // If one is compulsory and one is voluntary, it's not a perfect match
+  } else {
+    votingRightsScore = 50;
+  }
+
+  // Calculate the total score (equal weighting for all categories)
+  const totalScore = Math.round(
+    (legalStatusScore + residencyScore + militaryServiceScore + taxObligationsScore + votingRightsScore) / 5
   );
 
   return {
-    overallScore,
+    totalScore,
     categories: {
-      legalStatus: {
-        score: legalStatusScore,
-        description: legalStatusDescription,
-        implications: legalStatusImplications
-      },
-      residency: {
-        score: residencyScore,
-        description: residencyDescription,
-        implications: []
-      },
-      militaryService: {
-        score: militaryServiceScore,
-        description: militaryServiceDescription,
-        implications: []
-      },
-      taxObligations: {
-        score: taxScore,
-        description: taxDescription,
-        implications: []
-      },
-      votingRights: {
-        score: votingScore,
-        description: votingDescription,
-        implications: []
-      }
+      legalStatus: legalStatusScore,
+      residency: residencyScore,
+      militaryService: militaryServiceScore,
+      taxObligations: taxObligationsScore,
+      votingRights: votingRightsScore,
+    },
+  };
+};
+
+export const getLegalStatusImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
+  const implications = [];
+
+  // Basic dual citizenship status
+  if (country1Data.dualCitizenship === "Yes" && country2Data.dualCitizenship === "Yes") {
+    implications.push(`Both ${country1} and ${country2} permit dual citizenship.`);
+  } else if (country1Data.dualCitizenship === "No" && country2Data.dualCitizenship === "No") {
+    implications.push(`Neither ${country1} nor ${country2} permit dual citizenship. You would have to renounce one citizenship to acquire the other.`);
+  } else if (country1Data.dualCitizenship === "No") {
+    implications.push(`${country1} does not permit dual citizenship. You would need to renounce your ${country2} citizenship to become a citizen of ${country1}.`);
+  } else if (country2Data.dualCitizenship === "No") {
+    implications.push(`${country2} does not permit dual citizenship. You would need to renounce your ${country1} citizenship to become a citizen of ${country2}.`);
+  } else if (country1Data.dualCitizenship === "Conditional" && country2Data.dualCitizenship === "Conditional") {
+    implications.push(`Both ${country1} and ${country2} allow dual citizenship under certain conditions. Consult with immigration attorneys in both countries.`);
+  } else if (country1Data.dualCitizenship === "Conditional") {
+    implications.push(`${country1} allows dual citizenship only under certain conditions, while ${country2} ${country2Data.dualCitizenship === "Yes" ? "fully permits" : "does not permit"} dual citizenship.`);
+  } else if (country2Data.dualCitizenship === "Conditional") {
+    implications.push(`${country2} allows dual citizenship only under certain conditions, while ${country1} ${country1Data.dualCitizenship === "Yes" ? "fully permits" : "does not permit"} dual citizenship.`);
+  }
+
+  // Citizenship by descent
+  if (country1Data.citizenshipByDescent && country2Data.citizenshipByDescent) {
+    implications.push(`Citizenship by descent: ${country1} - ${country1Data.citizenshipByDescent}. ${country2} - ${country2Data.citizenshipByDescent}.`);
+  }
+
+  // Citizenship by marriage
+  if (country1Data.citizenshipByMarriage && country2Data.citizenshipByMarriage) {
+    implications.push(`Citizenship by marriage: In ${country1}, citizenship can be obtained ${country1Data.citizenshipByMarriage.toLowerCase()}. In ${country2}, citizenship can be obtained ${country2Data.citizenshipByMarriage.toLowerCase()}.`);
+  }
+
+  return implications;
+};
+
+export const getResidencyImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
+  const implications = [];
+
+  implications.push(`Both countries allow naturalization after certain periods of residency: ${country1} requires ${country1Data.residencyYears} years, while ${country2} requires ${country2Data.residencyYears} years.`);
+  
+  if (country1Data.residencyYears === country2Data.residencyYears) {
+    implications.push(`Both countries have the same residency requirement for naturalization (${country1Data.residencyYears} years).`);
+  } else if (Math.abs(country1Data.residencyYears - country2Data.residencyYears) <= 2) {
+    implications.push(`The residency requirements are similar between the two countries.`);
+  } else if (country1Data.residencyYears > country2Data.residencyYears) {
+    implications.push(`${country1} has a longer residency requirement (${country1Data.residencyYears} years) compared to ${country2} (${country2Data.residencyYears} years).`);
+  } else {
+    implications.push(`${country2} has a longer residency requirement (${country2Data.residencyYears} years) compared to ${country1} (${country1Data.residencyYears} years).`);
+  }
+
+  return implications;
+};
+
+export const getMilitaryServiceImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
+  const implications = [];
+
+  const getMilitaryDescription = (country: string, status: string) => {
+    switch (status) {
+      case "Yes":
+        return `${country} has mandatory military service for citizens.`;
+      case "No":
+        return `${country} does not require military service.`;
+      case "De jure":
+        return `${country} has military service requirements on paper but rarely enforces them.`;
+      case "Choice":
+        return `${country} offers a choice between military and alternative service.`;
+      case "Infrequent":
+        return `${country} has infrequent or limited conscription.`;
+      default:
+        return `${country}'s military service requirements are unclear.`;
     }
   };
+
+  implications.push(getMilitaryDescription(country1, country1Data.militaryService));
+  implications.push(getMilitaryDescription(country2, country2Data.militaryService));
+
+  if (country1Data.militaryService === "Yes" && country2Data.militaryService === "Yes") {
+    implications.push(`As both countries require military service, you may face competing obligations. This could create significant legal complications.`);
+  } else if (country1Data.militaryService === "Yes" || country2Data.militaryService === "Yes") {
+    const requiringCountry = country1Data.militaryService === "Yes" ? country1 : country2;
+    implications.push(`Your obligations to serve in ${requiringCountry}'s military may be affected by your dual citizenship status.`);
+  }
+
+  return implications;
+};
+
+export const getTaxObligationsImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
+  const implications = [];
+
+  // Check if USA is one of the countries
+  const isUSAInvolved = country1 === "USA" || country2 === "USA";
+  const nonUSACountry = country1 === "USA" ? country2 : country1;
+  const nonUSACountryData = country1 === "USA" ? country2Data : country1Data;
+
+  if (isUSAInvolved) {
+    implications.push(`USA taxes citizens on worldwide income regardless of residence, while ${nonUSACountry} generally taxes based on residence and/or source of income.`);
+    
+    if (nonUSACountryData.taxTreaty === "Yes") {
+      implications.push(`USA and ${nonUSACountry} have a tax treaty that may help prevent double taxation and provide certain tax benefits.`);
+    } else {
+      implications.push(`USA and ${nonUSACountry} do not have a comprehensive tax treaty, which may increase the risk of double taxation.`);
+    }
+    
+    implications.push(`US citizens must file annual tax returns regardless of where they live, and may need to report foreign bank accounts through FBAR and FATCA.`);
+  } else {
+    // Neither country is USA
+    if (country1Data.taxTreaty === "Yes" && country2Data.taxTreaty === "Yes") {
+      implications.push(`Both ${country1} and ${country2} have tax treaties with multiple countries, which may help prevent double taxation.`);
+    } else if (country1Data.taxTreaty === "Yes" || country2Data.taxTreaty === "Yes") {
+      const treatyCountry = country1Data.taxTreaty === "Yes" ? country1 : country2;
+      const nonTreatyCountry = country1Data.taxTreaty === "Yes" ? country2 : country1;
+      implications.push(`${treatyCountry} has more extensive tax treaties than ${nonTreatyCountry}, which may impact your overall tax situation.`);
+    } else {
+      implications.push(`Neither ${country1} nor ${country2} have extensive tax treaties, which may complicate your tax situation if you have income from multiple sources.`);
+    }
+  }
+
+  implications.push(`Consult with tax professionals in both ${country1} and ${country2} to understand your specific tax obligations and available relief from double taxation.`);
+
+  return implications;
+};
+
+export const getVotingRightsImplications = (country1: string, country2: string, country1Data: CountryData, country2Data: CountryData): string[] => {
+  const implications = [];
+
+  const getVotingDescription = (country: string, status: string) => {
+    if (status === "Universal and Compulsory") {
+      return `${country} has compulsory voting for citizens.`;
+    } else {
+      return `${country} has voluntary voting for citizens.`;
+    }
+  };
+
+  implications.push(getVotingDescription(country1, country1Data.votingStatus));
+  implications.push(getVotingDescription(country2, country2Data.votingStatus));
+
+  if (country1Data.votingStatus === "Universal and Compulsory" && country2Data.votingStatus === "Universal and Compulsory") {
+    implications.push(`Both countries require compulsory voting. You may need to fulfill voting obligations in both nations.`);
+  } else if (country1Data.votingStatus === "Universal and Compulsory" || country2Data.votingStatus === "Universal and Compulsory") {
+    const compulsoryCountry = country1Data.votingStatus === "Universal and Compulsory" ? country1 : country2;
+    const voluntaryCountry = country1Data.votingStatus === "Universal and Compulsory" ? country2 : country1;
+    implications.push(`${compulsoryCountry} requires compulsory voting, while voting in ${voluntaryCountry} is voluntary. This may create conflicting obligations.`);
+  } else {
+    implications.push(`Both countries have voluntary voting systems.`);
+  }
+
+  return implications;
 };
