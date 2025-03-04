@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import CountrySelector from "@/components/CountrySelector";
 import CompatibilityScore from "@/components/CompatibilityScore";
 import CategoryCard from "@/components/CategoryCard";
+import Logo from "@/components/Logo";
 import { motion } from "framer-motion";
 import { 
   calculateCompatibility, 
@@ -125,6 +126,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <Logo />
+        </div>
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">Dual Citizenship Compatibility Calculator</h1>
           <p className="text-xl text-gray-600">
